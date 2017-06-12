@@ -1,21 +1,34 @@
-import cloudinary from 'cloudinary-core/cloudinary-core-shrinkwrap';
 import axios from 'axios';
 import { ImagePicker } from 'expo';
 
-const cloudinaryCloudName = 'talkrise';
-const cl = cloudinary.Cloudinary.new({ cloud_name: cloudinaryCloudName });
+const API_DOMAIN = 'https://7bfbfdc6.ngrok.io';
+const CLOUD_NAME = 'talkrise';
+const UPLOAD_PRESET = 'xpyvf0by';
+const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
-export const convert = image => ({
-  id: image.id,
-  ticket_id: image.ticket_id,
-  public_id: image.public_id,
-  src: cl.url(image.public_id, {
-    crop: 'fit',
-    fetch_format: 'auto',
-    quality: 'auto',
-    secure: true,
-  }),
-});
+
+
+
+export const analyze = (uri) => {
+    return axios.get(`${API_DOMAIN}/analyze`, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      params: {
+        uri,
+      },
+    })
+    .then((response) => {
+      return response.data.outputs[0].data.concepts.map(concept => concept.name);
+    })
+    .catch(() => {
+      throw new Error('Something went wrong analyzing your image.');
+    });
+}
+
+
+
 
 export const pickImage = async () => {
   try {
@@ -26,20 +39,21 @@ export const pickImage = async () => {
     });
 
     if (result.cancelled) {
-      throw new Error();
+      throw new Error('Image Selection Cancelled');
     } else {
       return result;
     }
   } catch (error) {
-    return 'There was an issue picking your image';
+    throw new Error('There was an issue picking your image');
   }
 };
 
-export const upload = (image) => {
-  const upload_url = `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`;
 
-  return axios.post(upload_url, {
+
+
+export const upload = (image) => {
+  return axios.post(UPLOAD_URL, {
     file: `data:image/jpg;base64,${image.data}`,
-    upload_preset: 'xpyvf0by',
+    upload_preset: UPLOAD_PRESET,
   });
 };
