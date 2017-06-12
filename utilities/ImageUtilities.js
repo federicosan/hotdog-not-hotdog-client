@@ -1,14 +1,27 @@
+/**
+ * GENERAL NOTES
+ * @author TalkRise <admin@talkrise.com>
+ */
+
+
+// Module imports
 import axios from 'axios';
 import { ImagePicker } from 'expo';
 
-const API_DOMAIN = 'https://7bfbfdc6.ngrok.io';
+
+// Constants
+const API_DOMAIN = 'https://4bf5b684.ngrok.io';
 const CLOUD_NAME = 'talkrise';
 const UPLOAD_PRESET = 'xpyvf0by';
 const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
 
-
-
+/**
+ * @const analyze
+ * @description Function that hits API to get image analysis results
+ * @param uri
+ * @returns {*|Promise.<T>}
+ */
 export const analyze = (uri) => {
     return axios.get(`${API_DOMAIN}/analyze`, {
       headers: {
@@ -28,8 +41,11 @@ export const analyze = (uri) => {
 }
 
 
-
-
+/**
+ * @const pickImage
+ * @description Allows user to select asset from their image library
+ * @returns {Promise.<*>}
+ */
 export const pickImage = async () => {
   try {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -49,8 +65,12 @@ export const pickImage = async () => {
 };
 
 
-
-
+/**
+ * @const upload
+ * @description Uploads image to Cloudinary image service
+ * @param image
+ * @returns {AxiosPromise}
+ */
 export const upload = (image) => {
   return axios.post(UPLOAD_URL, {
     file: `data:image/jpg;base64,${image.data}`,
